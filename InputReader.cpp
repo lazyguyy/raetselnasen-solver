@@ -12,10 +12,10 @@ std::vector<MultiWord> InputReader::read_solutions_list(std::string &filename) {
         if (line.empty())
             continue;
         std::stringstream split_stream(line);
-        std::vector<std::string> multi_word;
+        MultiWord multi_word;
         std::string segment;
         while (std::getline(split_stream, segment, ',')) {
-            multi_word.push_back(segment);
+            multi_word.push_back(std::make_shared<std::string>(segment));
         }
         words.push_back(std::move(multi_word));
     }
@@ -39,6 +39,7 @@ Puzzle InputReader::read_puzzle_file(std::string &filename) {
     std::ifstream file_stream(filename);
     std::string line;
     size_t query_index = 0;
+    size_t total_words = 0;
     while (std::getline(file_stream, line)) {
         if (line.empty()) {
             word_breaks.insert(query_index - 1);
@@ -49,6 +50,7 @@ Puzzle InputReader::read_puzzle_file(std::string &filename) {
             auto mapping = match[1].str();
             size_t letter_index = 0;
             size_t word_index = std::stoi(match[2].str()) - 1;
+            total_words = std::max(total_words, word_index + 1);
             LetterMapType type;
             if (mapping[0] == 'L') {
                 type = back;
@@ -66,12 +68,13 @@ Puzzle InputReader::read_puzzle_file(std::string &filename) {
             query_index += 1;
         }
     }
-    return {letter_queries, word_breaks};
+    word_breaks.insert(query_index - 1);
+    return {letter_queries, word_breaks, total_words};
 }
 
-SuffixTree InputReader::read_word_list(std::string &filename, WordFilter &filter) {
+SuffixTree InputReader::read_word_list(std::string &filename, WordFilter &filter, bool allow_combinations) {
     std::ifstream word_file (filename);
-    SuffixTree dictionary = SuffixTree();
+    SuffixTree dictionary = SuffixTree(allow_combinations);
     std::string line;
     size_t total_words = 0;
     while (std::getline(word_file, line)) {
@@ -79,6 +82,6 @@ SuffixTree InputReader::read_word_list(std::string &filename, WordFilter &filter
             total_words += dictionary.add_word(line);
         }
     }
-    std::cout << "Build dictionary suffix tree with " << total_words << " entries." << std::endl;
+    std::cout << "Built dictionary suffix tree with " << total_words << " entries." << std::endl;
     return dictionary;
 }
