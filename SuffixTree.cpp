@@ -1,6 +1,7 @@
 
 #include "SuffixTree.h"
 #include <locale>
+#include <iostream>
 
 bool SuffixTree::add_word(const std::string &word) {
     return add_word(root, word, 0);
@@ -15,6 +16,7 @@ bool SuffixTree::add_word(Node &node, const std::string &word, size_t index) {
 
     if (node.children.count(letter) == 0){
         auto new_node = Node();
+        new_node.depth = node.depth + 1;
         node.children[letter] = new_node;
     }
     return add_word(node.children[letter], word, index + 1);
@@ -25,10 +27,11 @@ bool SuffixTree::has_word(const std::string &query) {
 }
 
 bool SuffixTree::has_word(Node &current_node, const std::string &query, size_t index) {
+//    std::cout << "matching " << query.substr(index) << " at depth " << current_node.depth << std::endl;
     if (index == query.size()) {
         return current_node.is_endpoint;
     }
-    if (allow_combinations && current_node.is_endpoint && has_word(root, query, index)) {
+    if (allow_combinations && current_node.depth >= min_length && current_node.is_endpoint && has_word(root, query, index)) {
         return true;
     }
     auto letter = std::tolower(query[index], std::locale());
@@ -56,8 +59,10 @@ void SuffixTree::get_words(Node &current_node, const std::string &query, size_t 
             matches.insert(current_path);
         return;
     }
-    if (allow_combinations && current_node.is_endpoint) {
+    if (allow_combinations && current_node.depth >= min_length && current_node.is_endpoint) {
         std::string copied_path(current_path);
+//        std::cout << current_node.depth << ", " << min_length << " ";
+//        std::cout << "jumping back after " << copied_path << std::endl;
         get_words(root, query, index, copied_path, matches);
     }
     auto letter = std::tolower(query[index], std::locale());

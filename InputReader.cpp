@@ -33,7 +33,7 @@ std::vector<MultiWord> InputReader::read_solutions_list(std::string &filename) {
 //  - M takes the middle letter (only makes sense for words of odd length)
 // double empty lines signify that the next word begins
 Puzzle InputReader::read_puzzle_file(std::string &filename) {
-    std::regex expr(R"((L-?\d*|M|\d+)P(\d+))");
+    std::regex expr(R"(([ALM]\d*)P(\d+))");
     std::vector<LetterMap> letter_queries;
     std::unordered_set<size_t> word_breaks;
     std::ifstream file_stream(filename);
@@ -52,16 +52,11 @@ Puzzle InputReader::read_puzzle_file(std::string &filename) {
             size_t word_index = std::stoi(match[2].str()) - 1;
             total_words = std::max(total_words, word_index + 1);
             LetterMapType type;
-            if (mapping[0] == 'L') {
-                type = back;
-                if (mapping.size() != 1) {
-                    letter_index = std::stoi(mapping.substr(2));
-                }
-            } else if (mapping[0] == 'M') {
+            if (mapping[0] == 'M') {
                 type = middle;
             } else {
-                type = front;
-                letter_index = std::stoi(mapping) - 1;
+                letter_index = std::stoi(mapping.substr(1)) - 1;
+                type = mapping[0] == 'L' ? back : front;
             }
             LetterMap new_query {type, letter_index, word_index};
             letter_queries.push_back(new_query);

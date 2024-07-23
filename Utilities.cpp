@@ -23,6 +23,10 @@ std::vector<std::vector<size_t>> get_all_combinations(std::vector<size_t> &limit
 size_t get_word_value(const std::string &word) {
     size_t value = 0;
     for (auto &letter : word) {
+        if (letter == '?') {
+            value += 1;
+            continue;
+        }
         value += int(std::tolower(letter, std::locale())) - int('a') + 1;
     }
     return value;

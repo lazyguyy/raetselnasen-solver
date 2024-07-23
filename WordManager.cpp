@@ -100,7 +100,7 @@ WordManager::WordManager(std::vector<MultiWord> &known_words, size_t total_words
             return get_word_value(*w1) <= get_word_value(*w2);
         });
         for (auto &word : word_list) {
-            std::cout << *word << "(" << get_word_value(*word) << ")" << std::endl;
+            std::cout << *word << " (" << get_word_value(*word) << ")" << std::endl;
         }
     }
 }
