@@ -6,6 +6,9 @@
 #include <unordered_set>
 #include <unordered_map>
 
+
+enum SuffixContained {No, Maybe, Yes};
+
 struct Node {
     std::unordered_map<char, Node> children;
     bool is_endpoint;
@@ -23,11 +26,16 @@ public:
         min_length = 4;
         root.depth = 0;
     };
+
+    bool dynamic_has_word(const std::string &query);
+
 private:
     Node root;
     bool add_word(Node &current_node, const std::string &word, size_t index);
     bool has_word(Node &current_node, const std::string &query, size_t index);
     void get_words(Node &current_node, const std::string &query, size_t index, std::string &current_path, std::unordered_set<std::string> &);
+
+    bool dynamic_has_word(Node &current_node, const std::string &query, size_t index, std::vector<SuffixContained> &);
 };
 
 
