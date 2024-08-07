@@ -9,6 +9,10 @@
 #include "Utilities.h"
 
 using Query = std::vector<std::string>;
+struct QueryStruct {
+    Query query;
+    size_t origin_index;
+};
 
 
 class WordManager {
@@ -17,14 +21,14 @@ public:
     bool finished = false;
     size_t total_possibilities;
     size_t past_orderings;
+    std::vector<WordList> collapsed_multi_words;
 
     bool next_ordering();
     bool complies(Puzzle &puzzle);
-    std::vector<Query> generate_queries(Puzzle &p);
+    std::vector<QueryStruct> generate_queries(Puzzle &p);
     bool isValidWordList(Puzzle &, WordList &);
     WordManager(std::vector<MultiWord> &known_words, size_t total_words);
 private:
-    std::vector<WordList> collapsed_multi_words;
     std::unordered_set<size_t> complying_word_lists;
     std::unordered_map<size_t, size_t> words_to_known_words;
     Query build_query(WordList &, Puzzle &);

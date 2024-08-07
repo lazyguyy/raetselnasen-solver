@@ -11,6 +11,8 @@ std::vector<MultiWord> InputReader::read_solutions_list(std::string &filename) {
     while (std::getline(input_file, line)) {
         if (line.empty())
             continue;
+        if (line[0] == '#')
+            continue;
         std::stringstream split_stream(line);
         MultiWord multi_word;
         std::string segment;
@@ -20,6 +22,23 @@ std::vector<MultiWord> InputReader::read_solutions_list(std::string &filename) {
         words.push_back(std::move(multi_word));
     }
     return words;
+}
+
+QueryFilter InputReader::read_filter_file(std::string &filename) {
+    std::ifstream input_file(filename);
+    std::string line;
+    QueryFilter filter;
+    std::regex expr(R"((\d+)\s(.*))");
+    while (std::getline(input_file, line)) {
+        if (line.empty()) {
+            continue;
+        }
+        std::smatch match;
+        std::regex_match(line, match, expr);
+        std::cout << "Filtering " << match[1] << " matching " << match[2] << std::endl;
+        filter.filters.emplace_back(std::stoi(match[1].str()) - 1, std::regex(match[2].str()));
+    }
+    return filter;
 }
 
 // Puzzle format:
@@ -41,6 +60,10 @@ Puzzle InputReader::read_puzzle_file(std::string &filename) {
     size_t query_index = 0;
     size_t total_words = 0;
     while (std::getline(file_stream, line)) {
+        if (total_words == 0) {
+            total_words = std::stoi(line);
+            continue;
+        }
         if (line.empty()) {
             word_breaks.insert(query_index - 1);
             continue;
@@ -50,7 +73,6 @@ Puzzle InputReader::read_puzzle_file(std::string &filename) {
             auto mapping = match[1].str();
             size_t letter_index = 0;
             size_t word_index = std::stoi(match[2].str()) - 1;
-            total_words = std::max(total_words, word_index + 1);
             LetterMapType type;
             if (mapping[0] == 'M') {
                 type = middle;

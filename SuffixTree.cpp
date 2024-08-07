@@ -26,9 +26,33 @@ bool SuffixTree::has_word(const std::string &query) {
     return has_word(root, query, 0);
 }
 
+bool SuffixTree::has_word(Node &current_node, const std::string &query, size_t index) {
+//    std::cout << "matching " << query.substr(index) << " at depth " << current_node.depth << std::endl;
+    if (index == query.size()) {
+        return current_node.is_endpoint;
+    }
+    if (allow_combinations && current_node.depth >= min_length && current_node.is_endpoint && has_word(root, query, index)) {
+        return true;
+    }
+    auto letter = std::tolower(query[index], std::locale());
+    if (letter == '?') {
+        for (auto &child_pair: current_node.children) {
+            if (has_word(child_pair.second, query, index + 1))
+                return true;
+        }
+    } else if (current_node.children.count(letter) > 0){
+        return has_word(current_node.children[letter], query, index + 1);
+    }
+    return false;
+}
+
 bool SuffixTree::dynamic_has_word(const std::string &query) {
+    if (previous_requests.count(query))
+        return previous_requests[query];
     std::vector<SuffixContained> contained_suffixes(query.size(), Maybe);
-    return dynamic_has_word(root, query, 0, contained_suffixes);
+    auto result = dynamic_has_word(root, query, 0, contained_suffixes);
+    previous_requests[query] = result;
+    return result;
 }
 
 bool SuffixTree::dynamic_has_word(Node &current_node, const std::string &query, size_t index, std::vector<SuffixContained> &contained_suffixes) {
@@ -54,25 +78,6 @@ bool SuffixTree::dynamic_has_word(Node &current_node, const std::string &query, 
     return false;
 }
 
-bool SuffixTree::has_word(Node &current_node, const std::string &query, size_t index) {
-//    std::cout << "matching " << query.substr(index) << " at depth " << current_node.depth << std::endl;
-    if (index == query.size()) {
-        return current_node.is_endpoint;
-    }
-    if (allow_combinations && current_node.depth >= min_length && current_node.is_endpoint && has_word(root, query, index)) {
-        return true;
-    }
-    auto letter = std::tolower(query[index], std::locale());
-    if (letter == '?') {
-        for (auto &child_pair: current_node.children) {
-            if (has_word(child_pair.second, query, index + 1))
-                return true;
-        }
-    } else if (current_node.children.count(letter) > 0){
-        return has_word(current_node.children[letter], query, index + 1);
-    }
-    return false;
-}
 
 std::unordered_set<std::string> SuffixTree::get_words(const std::string &query) {
     std::string offset;
@@ -106,3 +111,4 @@ void SuffixTree::get_words(Node &current_node, const std::string &query, size_t 
     }
     return;
 }
+

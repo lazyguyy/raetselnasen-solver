@@ -19,6 +19,7 @@ class SuffixTree {
 public:
     bool allow_combinations;
     size_t min_length;
+    std::unordered_map<std::string, bool> previous_requests;
     bool add_word(const std::string &word);
     bool has_word(const std::string &query);
     std::unordered_set<std::string> get_words(const std::string &query);

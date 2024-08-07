@@ -43,11 +43,11 @@ bool WordManager::complies(Puzzle &p) {
     return !complying_word_lists.empty();
 }
 
-std::vector<Query> WordManager::generate_queries(Puzzle &p) {
-    std::vector<Query> queries;
+std::vector<QueryStruct> WordManager::generate_queries(Puzzle &p) {
+    std::vector<QueryStruct> queries;
     queries.reserve(complying_word_lists.size());
     for (auto valid : complying_word_lists) {
-        queries.push_back(std::move(build_query(collapsed_multi_words[valid], p)));
+        queries.push_back({std::move(build_query(collapsed_multi_words[valid], p)), valid});
     }
     return queries;
 }
@@ -88,16 +88,16 @@ bool WordManager::isValidWordList(Puzzle &p, WordList &word_list) {
 }
 
 WordManager::WordManager(std::vector<MultiWord> &known_words, size_t total_words) {
-    total_possibilities = n_choose_k(total_words, total_words - known_words.size());
     past_orderings = 0;
     non_blanks = std::vector<bool>(total_words);
     for (size_t i = 0; i < known_words.size(); ++i) {
         non_blanks[i + total_words - known_words.size()] = true;
     }
     collapsed_multi_words = collapse_multi_words(known_words);
+    total_possibilities = n_choose_k(total_words, total_words - known_words.size()) * collapsed_multi_words.size();
     for (auto &word_list : collapsed_multi_words) {
         std::sort(word_list.begin(), word_list.end(), [](const SharedWord &w1, const SharedWord &w2) {
-            return get_word_value(*w1) <= get_word_value(*w2);
+            return (get_word_value(*w1) < get_word_value(*w2)) || (get_word_value(*w1) == get_word_value(*w2) && *w1 <= *w2);
         });
         for (auto &word : word_list) {
             std::cout << *word << " (" << get_word_value(*word) << ")" << std::endl;
