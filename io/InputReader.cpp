@@ -229,6 +229,8 @@ general_settings InputReader::parse_settings(std::ifstream &input_stream) {
             settings.show_matches = value == "true";
         } else if (variable == "total_words") {
             settings.total_words = std::stoi(value);
+        } else if (variable == "show_config") {
+            settings.show_configuration = value == "true";
         } else if (variable == "words_file") {
             settings.words_file = value;
         } else {
@@ -292,10 +294,10 @@ Puzzle InputReader::read_puzzle(const std::string &puzzle_config_file) {
             settings = parse_settings(input_stream);
         }
     }
-    std::cout << "read puzzle input!" << std::endl;
+    std::cout << "Finished loading dictionaries and puzzle input." << std::endl;
     words.reserve(unconstructed_words.size());
     for (auto &word_settings : unconstructed_words) {
         words.push_back(construct_word(word_settings, dicts));
     }
-    return {words, read_solutions_list(settings.words_file), dicts, settings.min_matches, settings.total_words, settings.detail_level, settings.show_matches};
+    return {words, read_solutions_list(settings.words_file), dicts, settings.min_matches, settings.total_words, settings.detail_level, settings.show_matches, settings.show_configuration};
 }

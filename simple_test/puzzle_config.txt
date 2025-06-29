@@ -4,35 +4,32 @@ general {
     show_matches = true;
     words_file = simple_test/words.txt;
 }
-
 dictionary {
     name = simpledict;
     filename = simple_test/dictionary.txt;
     type = single_word;
 }
-
 dictionary {
     name = anagramdict;
     filename = simple_test/dictionary.txt;
     type = anagram;
 }
-
 dictionary {
     name = multidict;
     filename = simple_test/dictionary.txt;
     type = multi_word;
-    filters = [{satisfy=true;regex=.....*;};{satisfy=false;regex=.*y.*;}];
+    filters = [{satisfy=true;regex=.....*;}];
 }
 word {
-    letters = [B3P2;B2P5;F5P6;F3P5;F2P3];
+    letters = [B3P2;B2P5;F5P6;F3P5;F2P3;];
     dictionary = simpledict;
 }
 word {
-    letters = [F1P6;B6P4;F3P4;F1P1;F2P7;B5P7;B1P4;F1P3;B5P5;B2P7;F4P5;F3P2;B2P3;MP4]
+    letters = [F1P6;B6P4;F3P4;F1P1;F2P7;B5P7;B1P4;F1P3;B5P5;B2P7;F4P5;F3P2;B2P3;MP4;]
     dictionary = multidict;
+    filters=[{satisfy=false;regex=^f.*;}]
 }
-
 word {
-    letters = [F2P7;B4P3;F4P7;B3P4;B1P3]
+    letters = [F2P7;B4P3;F4P7;B3P4;B1P3;]
     dictionary = anagramdict;
 };

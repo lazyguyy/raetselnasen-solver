@@ -30,6 +30,7 @@ struct general_settings {
     size_t min_matches;
     size_t total_words;
     bool show_matches;
+    bool show_configuration;
     std::string words_file;
 };
 
@@ -41,6 +42,7 @@ struct Puzzle {
     size_t total_words;
     size_t detail_level;
     bool show_matches;
+    bool show_configuration;
 };
 
 class InputReader {

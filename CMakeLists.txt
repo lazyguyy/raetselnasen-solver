@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
 project(raetsel_solver)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 
 add_executable(raetsel_solver main.cpp
         Utilities.h

@@ -106,9 +106,9 @@ QueryManager::QueryManager(std::vector<MultiWord> &known_words, size_t total_wor
         std::sort(word_list.begin(), word_list.end(), [](const SharedWord &w1, const SharedWord &w2) {
             return (get_word_value(*w1) < get_word_value(*w2)) || (get_word_value(*w1) == get_word_value(*w2) && *w1 <= *w2);
         });
-        for (auto &word : word_list) {
-            std::cout << *word << " (" << get_word_value(*word) << ")" << std::endl;
-        }
+//        for (auto &word : word_list) {
+//            std::cout << *word << " (" << get_word_value(*word) << ")" << std::endl;
+//        }
     }
 }
 

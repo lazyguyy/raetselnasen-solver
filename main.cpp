@@ -29,7 +29,6 @@ bool check_query(std::vector<WordQuery> query, size_t min_matches) {
 }
 
 void test_dictionary(std::shared_ptr<Dictionary> &dictionary) {
-    std::cout << "Entering Dictionary Test Mode" << std::endl;
     std::string input;
     while (std::getline(std::cin, input)) {
         size_t unknowns = static_cast<size_t>(std::count(input.begin(), input.end(), '?'));
@@ -55,19 +54,24 @@ int main(int argc, char **argv) {
     }
     if (parser.has_option_value("-t")) {
         std::string dict = parser.get_option_value("-t");
+        if (puzzle.dictionaries.count(dict) == 0) {
+            std::cout << "No Dictionary of name " << dict << " was defined." << std::endl;
+            return 0;
+        }
+        std::cout << "Entering Dictionary Test Mode for " << dict << std::endl;
         test_dictionary(puzzle.dictionaries[dict]);
     }
     std::cout << "Constructing word manager" << std::endl;
     QueryManager manager(puzzle.input_words, puzzle.total_words);
-    std::cout << "Now testing (" << puzzle.total_words << " choose " << puzzle.input_words.size() << ") * " << manager.collapsed_multi_words.size() << " = " << manager.total_possibilities  << " possible arrangements." << std::endl;
+    std::cout << "There are (" << puzzle.total_words << " choose " << puzzle.input_words.size() << ") * " << manager.collapsed_multi_words.size() << " = " << manager.total_possibilities  << " possible configurations." << std::endl;
     std::vector<QueryStruct> successful_queries;
     std::vector<std::vector<bool>> non_blanks;
     size_t check_interval = manager.total_possibilities / 100 / manager.collapsed_multi_words.size() + 1;
     while (!manager.finished) {
-//        auto percentage = manager.past_orderings * 100 * manager.collapsed_multi_words.size() / manager.total_possibilities;
-//        if (manager.past_orderings % check_interval == 0) {
-//            std::cout << (percentage % 10 == 0 ? '|' : '.') << std::flush;
-//        }
+        auto percentage = manager.past_orderings * 100 * manager.collapsed_multi_words.size() / manager.total_possibilities;
+        if (manager.past_orderings % check_interval == 0) {
+            std::cout << (percentage % 10 == 0 ? '|' : '.') << std::flush;
+        }
         if (manager.complies(puzzle)) {
             auto all_queries = manager.generate_queries(puzzle);
             for (auto &query_struct : all_queries) {
@@ -82,11 +86,15 @@ int main(int argc, char **argv) {
         }
         manager.next_ordering();
     }
-    std::cout << successful_queries.size() << " orderings matching at least " << puzzle.min_matches << " words were found!\n";
-    for (const auto &query_struct : successful_queries) {
+    std::cout << "\n" << successful_queries.size() << " orderings matching at least " << puzzle.min_matches << " words were found!\n";
+    for (size_t i = 0; i < successful_queries.size(); ++i) {
+        auto &query_struct = successful_queries[i];
         print_container<WordQuery, std::string>(query_struct.query, [](const WordQuery &query) -> std::string {return query.query_string;});
         std::vector<std::vector<std::string>> matches;
         size_t max_matches = 0;
+        if (puzzle.show_configuration) {
+            print_container<bool, bool>(non_blanks[i], [](const bool &b) -> bool{return b;});
+        }
         for (size_t query_index = 0; query_index < query_struct.query.size(); ++query_index) {
             const auto query = query_struct.query[query_index];
             const auto word = puzzle.words[query_index];
@@ -111,6 +119,9 @@ int main(int argc, char **argv) {
                 std::cout << std::endl;
             }
 
+        }
+        else {
+            std::cout << std::endl;
         }
     }
 }
