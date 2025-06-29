@@ -1,0 +1,35 @@
+general {
+    min_matches = 3;
+    total_words = 6;
+    show_matches = true;
+}
+
+dictionary {
+    name = simpledict;
+    filename = simple_test/dictionary.txt;
+    type = single_word;
+}
+
+dictionary {
+    name = multidict;
+    filename = simple_test/dictionary.txt;
+    type = multi_word;
+    filters = [{satisfy=true;regex=.....*;};{satisfy=false;regex=.*y.*;};]
+}
+word {
+    letters = [F2P2;B2P4;F5P5;B2P6;B5P3]
+    dictionary = simpledict;
+}
+word {
+    letters = [F2P2;B2P4;F5P5;B2P6;B5P3;MP6;F3P3;F3P6;B4P4;F1P1]
+    dictionary = multidict;
+}
+
+word {
+    letters = [MP6;
+               F3P3;
+               F3P6;
+               B4P4;
+               F1P1]
+    dictionary = simpledict;
+};
