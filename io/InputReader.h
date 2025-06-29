@@ -2,9 +2,8 @@
 #ifndef RAETSEL_SOLVER_INPUTREADER_H
 #define RAETSEL_SOLVER_INPUTREADER_H
 
-#include "Utilities.h"
-#include "word_management/TreeDictionary.h"
-#include "QueryManager.h"
+#include "../Utilities.h"
+#include "../word_management/TreeDictionary.h"
 
 
 struct filter_settings {
@@ -31,9 +30,18 @@ struct general_settings {
     size_t min_matches;
     size_t total_words;
     bool show_matches;
+    std::string words_file;
 };
 
-
+struct Puzzle {
+    std::vector<Word> words;
+    std::vector<MultiWord> input_words;
+    std::unordered_map<std::string, std::shared_ptr<Dictionary>> dictionaries;
+    size_t min_matches;
+    size_t total_words;
+    size_t detail_level;
+    bool show_matches;
+};
 
 class InputReader {
 public:

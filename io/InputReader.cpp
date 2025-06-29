@@ -1,8 +1,8 @@
 
 #include "InputReader.h"
-#include "word_management/AnagramDictionary.h"
-#include "word_management/TreeDictionary.h"
-#include "word_management/MultiWordTreeDictionary.h"
+#include "../word_management/AnagramDictionary.h"
+#include "../word_management/TreeDictionary.h"
+#include "../word_management/MultiWordTreeDictionary.h"
 #include <fstream>
 #include <sstream>
 #include <regex>
@@ -229,6 +229,8 @@ general_settings InputReader::parse_settings(std::ifstream &input_stream) {
             settings.show_matches = value == "true";
         } else if (variable == "total_words") {
             settings.total_words = std::stoi(value);
+        } else if (variable == "words_file") {
+            settings.words_file = value;
         } else {
             std::cout << "Unknown general setting: '" << variable << "' with value '" << value << "'." << std::endl;
             valid = false;
@@ -295,5 +297,5 @@ Puzzle InputReader::read_puzzle(const std::string &puzzle_config_file) {
     for (auto &word_settings : unconstructed_words) {
         words.push_back(construct_word(word_settings, dicts));
     }
-    return {words, settings.min_matches, settings.total_words, settings.detail_level, settings.show_matches};
+    return {words, read_solutions_list(settings.words_file), dicts, settings.min_matches, settings.total_words, settings.detail_level, settings.show_matches};
 }
