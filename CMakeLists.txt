@@ -12,8 +12,6 @@ add_executable(raetsel_solver main.cpp
         QueryManager.h
         io/InputReader.cpp
         io/InputReader.h
-        Puzzle.cpp
-        Puzzle.h
         word_management/AnagramDictionary.cpp
         word_management/AnagramDictionary.h
         word_management/Dictionary.h
