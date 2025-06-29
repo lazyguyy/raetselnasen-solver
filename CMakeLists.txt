@@ -6,9 +6,16 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(raetsel_solver main.cpp
         Utilities.h
         Utilities.cpp
-        SuffixTree.h
-        SuffixTree.cpp
-        WordManager.cpp
-        WordManager.h
+        word_management/TreeDictionary.h
+        word_management/TreeDictionary.cpp
+        QueryManager.cpp
+        QueryManager.h
         InputReader.cpp
-        InputReader.h)
+        InputReader.h
+        Puzzle.cpp
+        Puzzle.h
+        word_management/AnagramDictionary.cpp
+        word_management/AnagramDictionary.h
+        word_management/Dictionary.h
+        word_management/MultiWordTreeDictionary.cpp
+        word_management/MultiWordTreeDictionary.h)
