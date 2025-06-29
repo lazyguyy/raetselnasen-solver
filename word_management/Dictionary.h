@@ -16,6 +16,17 @@ struct WordQuery {
     size_t unknown_letters;
 };
 
+
+struct Word {
+    std::vector<LetterMap> letters;
+    std::vector<Filter> word_filters;
+    std::shared_ptr<Dictionary> dictionary;
+
+    Word(std::vector<LetterMap> &letters, std::vector<Filter> &word_filters, std::shared_ptr<Dictionary> d):
+            letters(letters), word_filters(word_filters), dictionary(std::move(d)) {}
+
+};
+
 class Dictionary {
 public:
     bool print_words;

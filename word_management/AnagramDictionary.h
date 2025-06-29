@@ -17,9 +17,10 @@ public:
     bool add_word(const std::string &word) override;
     bool has_word(const WordQuery &query) override;
     std::vector<std::string> get_words(const WordQuery &query) override;
-private:
 
-    bool has_word(const Node &, const std::string &, size_t index, size_t blanks);
+private:
+    bool has_word(Node &, const std::string &, size_t index, size_t blanks);
+    void get_words(Node &, const std::string &, size_t index, std::string&&, size_t blanks, std::unordered_set<std::string> &);
 };
 
 
