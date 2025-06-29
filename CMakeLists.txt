@@ -10,12 +10,14 @@ add_executable(raetsel_solver main.cpp
         word_management/TreeDictionary.cpp
         QueryManager.cpp
         QueryManager.h
-        InputReader.cpp
-        InputReader.h
+        io/InputReader.cpp
+        io/InputReader.h
         Puzzle.cpp
         Puzzle.h
         word_management/AnagramDictionary.cpp
         word_management/AnagramDictionary.h
         word_management/Dictionary.h
         word_management/MultiWordTreeDictionary.cpp
-        word_management/MultiWordTreeDictionary.h)
+        word_management/MultiWordTreeDictionary.h
+        io/OptionParser.cpp
+        io/OptionParser.h)

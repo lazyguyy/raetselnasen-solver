@@ -2,12 +2,19 @@ general {
     min_matches = 3;
     total_words = 6;
     show_matches = true;
+    words_file = simple_test/words.txt;
 }
 
 dictionary {
     name = simpledict;
     filename = simple_test/dictionary.txt;
     type = single_word;
+}
+
+dictionary {
+    name = anagrams;
+    filename = simple_test/dictionary.txt;
+    type = anagram;
 }
 
 dictionary {

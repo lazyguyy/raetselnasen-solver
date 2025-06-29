@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <bits/shared_ptr.h>
 #include "Utilities.h"
-#include "Puzzle.h"
+#include "io/InputReader.h"
 
 
 using FinalizedQuery = std::vector<WordQuery>;

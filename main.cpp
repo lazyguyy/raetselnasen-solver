@@ -1,10 +1,10 @@
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <sstream>
 #include "Utilities.h"
 #include "word_management/TreeDictionary.h"
-#include "InputReader.h"
+#include "io/InputReader.h"
+#include "QueryManager.h"
+#include "io/OptionParser.h"
 
 bool single_query(const WordQuery &query) {
     return query.dictionary->has_word(query);
@@ -28,16 +28,38 @@ bool check_query(std::vector<WordQuery> query, size_t min_matches) {
     return matched_words >= min_matches;
 }
 
-int main() {
-    std::string solutions_file = "simple_test/words.txt";
-    std::string puzzle_file = "simple_test/puzzle_config.txt";
-    std::cout << "Reading solutions file" << std::endl;
-    auto solutions = InputReader::read_solutions_list(solutions_file);
-    std::cout << "Reading letter mappings" << std::endl;
+void test_dictionary(std::shared_ptr<Dictionary> &dictionary) {
+    std::cout << "Entering Dictionary Test Mode" << std::endl;
+    std::string input;
+    while (std::getline(std::cin, input)) {
+        size_t unknowns = static_cast<size_t>(std::count(input.begin(), input.end(), '?'));
+        WordQuery query {input, dictionary, unknowns};
+        std::cout << dictionary->has_word(query) << std::endl;
+        auto found = dictionary->get_words(query);
+        if (!found.empty()) {
+            print_container<std::string, std::string>(found, [](const std::string &input) -> std::string{return input;});
+        }
+    }
+}
+
+int main(int argc, char **argv) {
+    OptionParser parser(argc, argv);
+    std::string puzzle_file = "puzzle_config.txt";
+    if (parser.has_option_value("-f")) {
+        puzzle_file = parser.get_option_value("-f");
+    }
+    std::cout << "Reading puzzle file" << std::endl;
     auto puzzle = InputReader::read_puzzle(puzzle_file);
+    if (parser.has_option("-i")) {
+        // TODO start interactive mode
+    }
+    if (parser.has_option_value("-t")) {
+        std::string dict = parser.get_option_value("-t");
+        test_dictionary(puzzle.dictionaries[dict]);
+    }
     std::cout << "Constructing word manager" << std::endl;
-    QueryManager manager(solutions, puzzle.total_words);
-    std::cout << "Now testing (" << puzzle.total_words << " choose " << solutions.size() << ") * " << manager.collapsed_multi_words.size() << " = " << manager.total_possibilities  << " possible arrangements." << std::endl;
+    QueryManager manager(puzzle.input_words, puzzle.total_words);
+    std::cout << "Now testing (" << puzzle.total_words << " choose " << puzzle.input_words.size() << ") * " << manager.collapsed_multi_words.size() << " = " << manager.total_possibilities  << " possible arrangements." << std::endl;
     std::vector<QueryStruct> successful_queries;
     std::vector<std::vector<bool>> non_blanks;
     size_t check_interval = manager.total_possibilities / 100 / manager.collapsed_multi_words.size() + 1;
