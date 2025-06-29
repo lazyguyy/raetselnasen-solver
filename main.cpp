@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
         if (manager.complies(puzzle)) {
             auto all_queries = manager.generate_queries(puzzle);
             for (auto &query_struct : all_queries) {
-                print_container<WordQuery, std::string>(query_struct.query, [](const WordQuery &query) -> std::string {return query.query_string;});
+//                print_container<WordQuery, std::string>(query_struct.query, [](const WordQuery &query) -> std::string {return query.query_string;});
                 auto &query = query_struct.query;
 //                std::cout << manager.past_orderings << "(" << percentage << "%): ";
                 if (check_query(query, puzzle.min_matches)) {

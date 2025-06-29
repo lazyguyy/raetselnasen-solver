@@ -1,6 +1,7 @@
-duh
+bud
 this
+sound
 #program
 #solves
-puzzles
-veryswiftly
+#puzzles
+flawlessly

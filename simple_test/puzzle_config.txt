@@ -1,6 +1,6 @@
 general {
     min_matches = 3;
-    total_words = 6;
+    total_words = 7;
     show_matches = true;
     words_file = simple_test/words.txt;
 }
@@ -12,7 +12,7 @@ dictionary {
 }
 
 dictionary {
-    name = anagrams;
+    name = anagramdict;
     filename = simple_test/dictionary.txt;
     type = anagram;
 }
@@ -21,22 +21,18 @@ dictionary {
     name = multidict;
     filename = simple_test/dictionary.txt;
     type = multi_word;
-    filters = [{satisfy=true;regex=.....*;};{satisfy=false;regex=.*y.*;};]
+    filters = [{satisfy=true;regex=.....*;};{satisfy=false;regex=.*y.*;}];
 }
 word {
-    letters = [F2P2;B2P4;F5P5;B2P6;B5P3]
+    letters = [B3P2;B2P5;F5P6;F3P5;F2P3];
     dictionary = simpledict;
 }
 word {
-    letters = [F2P2;B2P4;F5P5;B2P6;B5P3;MP6;F3P3;F3P6;B4P4;F1P1]
+    letters = [F1P6;B6P4;F3P4;F1P1;F2P7;B5P7;B1P4;F1P3;B5P5;B2P7;F4P5;F3P2;B2P3;MP4]
     dictionary = multidict;
 }
 
 word {
-    letters = [MP6;
-               F3P3;
-               F3P6;
-               B4P4;
-               F1P1]
-    dictionary = simpledict;
+    letters = [F2P7;B4P3;F4P7;B3P4;B1P3]
+    dictionary = anagramdict;
 };
