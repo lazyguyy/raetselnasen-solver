@@ -40,6 +40,57 @@ void test_dictionary(std::shared_ptr<Dictionary> &dictionary) {
         }
     }
 }
+void show_matched(std::vector<WordQuery> &queries) {
+    for (const auto &query : queries) {
+        bool matched = single_query(query);
+        std::cout << std::string(query.query_string.size(), matched ? '+' : '-') << " ";
+    }
+    std::cout << std::endl;
+}
+
+void show_matches(std::vector<WordQuery> &queries) {
+    std::vector<std::vector<std::string>> matches;
+    size_t max_matches = 0;
+    for (const auto &query : queries) {
+        matches.push_back(query.dictionary->get_words(query));
+        max_matches = std::max(max_matches, matches.back().size());
+    }
+    for (size_t row = 0; row < max_matches; ++row) {
+        for (size_t word = 0; word < queries.size(); ++word) {
+            if (row < matches[word].size()) {
+                std::cout << matches[word][row];
+            } else {
+                std::cout << std::string(queries[word].query_string.size(), ' ');
+            }
+            std::cout << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+void query_test_mode(Puzzle &puzzle) {
+    std::string input;
+    while (std::getline(std::cin, input)) {
+        auto queries = split_string(input, ' ');
+        if (queries.size() != puzzle.words.size()) {
+            std::cout << "A query needs to consist of " << puzzle.words.size() << " words (" << queries.size() << " words were given)." << std::endl;
+            continue;
+        }
+        std::vector<WordQuery> word_queries;
+        for (size_t i = 0; i < queries.size(); ++i) {
+            WordQuery word_query;
+            word_query.query_string = queries[i];
+            word_query.dictionary = puzzle.words[i].dictionary;
+            word_query.unknown_letters = std::count(queries[i].begin(), queries[i].end(), '?');
+            word_queries.push_back(word_query);
+        }
+        if (puzzle.show_matches) {
+            show_matches(word_queries);
+        } else {
+            show_matched(word_queries);
+        }
+    }
+}
 
 int main(int argc, char **argv) {
     OptionParser parser(argc, argv);
@@ -50,7 +101,8 @@ int main(int argc, char **argv) {
     std::cout << "Reading puzzle file" << std::endl;
     auto puzzle = InputReader::read_puzzle(puzzle_file);
     if (parser.has_option("-i")) {
-        // TODO start interactive mode
+        std::cout << "Entering interactive mode. Simply enter a query below." << std::endl;
+        query_test_mode(puzzle);
     }
     if (parser.has_option_value("-t")) {
         std::string dict = parser.get_option_value("-t");
@@ -90,38 +142,13 @@ int main(int argc, char **argv) {
     for (size_t i = 0; i < successful_queries.size(); ++i) {
         auto &query_struct = successful_queries[i];
         print_container<WordQuery, std::string>(query_struct.query, [](const WordQuery &query) -> std::string {return query.query_string;});
-        std::vector<std::vector<std::string>> matches;
-        size_t max_matches = 0;
+        if (puzzle.show_matches) {
+            show_matches(query_struct.query);
+        } else {
+            show_matched(query_struct.query);
+        }
         if (puzzle.show_configuration) {
             print_container<bool, bool>(non_blanks[i], [](const bool &b) -> bool{return b;});
-        }
-        for (size_t query_index = 0; query_index < query_struct.query.size(); ++query_index) {
-            const auto query = query_struct.query[query_index];
-            const auto word = puzzle.words[query_index];
-            if (!puzzle.show_matches) {
-                bool matched = single_query(query);
-                std::cout << std::string(query.query_string.size(), matched ? '+' : '-') << " ";
-            } else {
-                matches.push_back(word.dictionary->get_words(query));
-                max_matches = std::max(max_matches, matches.back().size());
-            }
-        }
-        if (puzzle.show_matches) {
-            for (size_t row = 0; row < max_matches; ++row) {
-                for (size_t word = 0; word < query_struct.query.size(); ++word) {
-                    if (row < matches[word].size()) {
-                        std::cout << matches[word][row];
-                    } else {
-                        std::cout << std::string(query_struct.query[word].query_string.size(), ' ');
-                    }
-                    std::cout << " ";
-                }
-                std::cout << std::endl;
-            }
-
-        }
-        else {
-            std::cout << std::endl;
         }
     }
 }
