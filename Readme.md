@@ -5,7 +5,7 @@ This is an ultra-specialized program written to make solving a certain type of p
 
 Let us first understand how the puzzle works: First, there are about 25 individual riddles, each having a single string as its solution. These *partial solutions* must then be combined to obtain the puzzle's actual solution, which is done as follows:
  * Order all partial solutions by their word value. The value of a word is simply the sum of its letter values, and the value of a letter is its position in the alphabet (i.e. ``a = 1, b = 2, ...``).
- * The final solution can then be built by combining the letters of the partial solutions according to a list of simple rules. Each rule specifies a letter position (either the *i*-th letter from the front, the *i*-th letter from the back or the middle letter) of the *j*-th word in the ordered word list.
+ * The final solution can then be built by combining the letters of the partial solutions according to a list of simple rules. Each rule specifies a letter position (either the *i*-th letter from the front, the *i*-th letter from the back, or the middle letter) of the *j*-th word in the ordered word list.
 
 Since the final solution should be some combination of actual words, it might be possible to guess it even with several unknown partial solutions.
 Because the position of each partial solution is not fixed (we do not know the word values of the unknown partial solutions, only the *order* of the known partial solutions), there are quite a lot of possible arrangements even when only a few partial solutions are unknown.
@@ -14,11 +14,11 @@ This is where this handy program comes in: It iterates through all possible arra
 
 # Running this Program
 This program is written in ``C++`` and should be compatible with ``cmake 3.28.1`` or greater and any compiler providing ``C++ 11`` features (locally I've been compiling it with ``g++ 13.1.0``). It takes the following command line options:
- * ``-f <puzzle_config>``: This is the most important argument and points to the configuration file the program should be using (more on the config file format in the next chapter). Please note that all paths specified in the config file are relative to the program's working directory, not the config file itself
+ * ``-f <puzzle_config>``: This is the most important argument and points to the configuration file the program should be using (more on the config file format in the next chapter). Please note that all paths specified in the config file are relative to the program's working directory, not the config file itself.
  * ``-t <dictionary_name>``: Instead of solving the supplied puzzle, enters a test mode for the specified dictionary.
  * ``-q``: Instead of solving the supplied puzzle, enters a query test mode for the puzzle.
 
-# Crafting a ``puzzle_config``-File
+# Crafting a ``puzzle_config`` file
 A puzzle config file specifies all the options needed to solve the puzzle. There are three types of objects (``general, dictionary, word``) that can be defined in the config file. The syntax is 
 ```
 object1 {
@@ -29,7 +29,7 @@ object2 {
     ...
 }
 ```
-Special characters are `=`, `;`, brackets `[]` and paranthesis `{}`. A semicolon is generally needed to finish a property declaration or to separate list elements, however its use is optional when it would *follow* another special character.
+Special characters are `=`, `;`, brackets `[]` and parentheses `{}`. A semicolon is generally needed to finish a property declaration or to separate list elements, however its use is optional when it would *follow* another special character.
  * ``general`` contains general options for the puzzle. These include 
    * ``total_words (int)``: The number of words in the final solution
    * ``min_matches (int)``: How many words of the final solution should match at minimum for a configuration to not be discarded
@@ -47,14 +47,14 @@ Special characters are `=`, `;`, brackets `[]` and paranthesis `{}`. A semicolon
    * ``letters [LetterRule]``: The letter rules by which this word is constructed. Each ``LetterRule`` is of the following syntax ``[F|B|M]<index>P<index>`` where the first letter specifies whether the letter should be taken from the **F**ront, **B**ack or **M**iddle along with the (for ``M``-type rules unnecessary) index (starting from 1), followed by ``P`` and the index of the word in the ordered partial solution list from which the letter should be taken.
    * ``filters [Filter]``: A list of filters, which work exactly the same as the dictionary filters, only they are applied to the dictionary query created for this word.
 
-# A Simple Example
-The folder ``./simple_test`` contains a simple example to better understand the workings of the program better. There are seven partial solutions
+# A simple example
+The folder ``./simple_test`` contains a simple example to better understand the workings of the program. There are seven partial solutions
 ``bud this program solves puzzles flawlessly`` and the final solution consists of three words:
  * The first word is constructed with the letter rules ``letters = [B3P2;B2P5;F5P6;F3P5;F2P3]`` and is a normal word.
  * The second word is a concatenation of at least two words and its letter rules are ``letters = [F1P6;B6P4;F3P4;F1P1;F2P7;B5P7;B1P4;F1P3;B5P5;B2P7;F4P5;F3P2;B2P3;MP4]``
  * The last word is anagrammed and consists of the letters ``[F2P7;B4P3;F4P7;B3P4;B1P3]``.
 
-Our word bank (a list of 10'000 (popular?) english words yoinked from [here](https://apiacoa.org/publications/teaching/datasets/google-10000-english.txt)) is saved in ``dictionary.txt`` and the partial solutions are contained in ``words.txt``. We may craft the following configuration file:
+Our word bank (a list of 10'000 (popular?) English words yoinked from [here](https://apiacoa.org/publications/teaching/datasets/google-10000-english.txt)) is saved in ``dictionary.txt`` and the partial solutions are contained in ``words.txt``. We may craft the following configuration file:
 ```
 general {
     min_matches = 3;
@@ -92,7 +92,7 @@ word {
 }
 ```
 
-Since random dictionary files generated from the internet are often not very clean, it is very important to preprocess them as otherwise the number of matches (especially in ``multi_word``-type dictionaries) can increase dramatically. As a simple clean-up, we remove all words from the ``multi_word`` dictionary of length less than four.
+Since random dictionary files generated from the internet are often not very clean, it is very important to preprocess them as otherwise the number of matches (especially in ``multi_word``-type dictionaries) can increase dramatically. As a simple clean-up, we remove all words from the ``multi_word`` dictionary of length less than four. 
 
 Depending on how many of the seven partial solutions we provide in ``words.txt``, the outputs may look drastically different.
 
@@ -197,6 +197,8 @@ hello forbes         could
 ```
 Obviously we cannot say with certainty what the solution should be, but depending on the context we may be able to discard the second group of matches, since ``forbes`` might be very unlikely to be part of the solution.
 
+Here we also see the structure of a query: Depending on the placement of the known words in the current configuration, we simply construct each word from the actual solution to the best of our abilities, filling unknown letters in with a '?'.
+
 Adding the filter ``filters=[{satisfy=false;regex=^f.*;}]`` to our second word discards that group of matches completely, and we arrive at
 ```
 ...
@@ -224,10 +226,10 @@ More sophisticated filtering can also be done externally, however the filters ar
 
 In addition, during query iteration, it is only checked whether words satisfying a given query exist, which is usually much faster than compiling a list of *every* word that might fit.
 
-# A more Realistic Example
+# A more realistic example
 While the above example might look a bit contrived, we can validate our program's performance with [last year's puzzle](https://www.raetselnasen.de/sommerraetsel-2024/).
 
-A realistic word list for an experienced puzzler may contain 22 of the 27 partial solutions with some uncertainty included:
+An experienced puzzler may reasonably find 22 of the 27 partial solutions with some uncertainty included:
 ```
 aerztin
 augsburg
@@ -252,7 +254,8 @@ vier
 clinteastwood,clintoneastwoodjr
 sodoge
 ```
-Our puzzle configuration file is not that much longer than before, you can find it in ``puzzle24/puzzle_config.txt``. Of course, the multiword dictionary is already used for the right words, but with a bit of trial and error you can definitely arrive at this output.
+Our puzzle configuration file is not that much longer than before, you can find it in ``puzzle24/puzzle_config.txt``. Of course, the words have been cleverly matched to the dictionaries, but this is nothing that couldn't be solved by a little trial and error.
+
 Setting ``show_matches=false;`` to declutter the output a bit, we are left with an already pretty promising output:
 ```
 ...
@@ -361,79 +364,33 @@ mon??lic? zuzug kinoabend zehnhoch?eu? bonn m???r?iii zeugin
 +++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
 mon??lic? zuzug ?inoabend zehnhoch?eu? bonn m???rgiii zeugin
 +++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-mon??lic? zuzu? einoabend zehnhoch?eu? bonn m???rgiii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-?on??lic? zuzug kinoabrnd zehnho?h?eu? bonn m???eviii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-?on??lic? zuzug rinoabend zehnho?h?eu? bonn m???rgiii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-mon??lic? zuzug rino?bend zehnhoch?eu? bonn ????rgiii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-mon??lic? ?uzug rinoobend zehnhoch?eu? b?nn u???rgiii zeu?in
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-mon??lic? zuzug kinoab?nd zehnhoch?eu? bonn m??e??iii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-mon??lic? zuzug ?inoab?nd zehnhoch?eu? bonn m??e?giii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-mon??lic? zuzu? einoab?nd zehnhoch?eu? bonn m??e?giii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-?on??lic? zuzug kinoab?nd zehnho?h?eu? bonn m??r?viii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-?on??lic? zuzug rinoab?nd zehnho?h?eu? bonn m??e?giii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-mon??lic? zuzug rino?b?nd zehnhoch?eu? bonn ???e?giii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-mon??lic? ?uzug rinoob?nd zehnhoch?eu? b?nn u??e?giii zeu?in
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-mon??lic? zuzug ?inoabind zehnhoch?eu? bonn m??ek?iii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-mon??lic? zuzu? einoabind zehnhoch?eu? bonn m??ek?iii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-?on??lic? zuzug kinoabend zehnho?h?eu? bonn m??rr?iii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-?on??lic? zuzug rinoabind zehnho?h?eu? bonn m??ek?iii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-mon??lic? zuzug rino?bind zehnhoch?eu? bonn ???ek?iii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-mon??lic? ?uzug rinoobind zehnhoch?eu? b?nn u??ek?iii zeu?in
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-mon??lic? zuzu? ?inoabind zehnhoch?eu? bonn m??eksiii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-?on??lic? zuzug ?inoabend zehnho?h?eu? bonn m??rrgiii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-?on??lic? zuzug ?inoabind zehnho?h?eu? bonn m??ekkiii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-mon??lic? zuzug ?ino?bind zehnhoch?eu? bonn ???ekkiii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-mon??lic? ?uzug ?inoobind zehnhoch?eu? b?nn u??ekkiii zeu?in
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-ronchlhee ?u?ai ?h?odwig? bnd?t?rereit b?h? oaeeksiml heu?rn
---------- +++++ +++++++++ ++++++++++++ ++++ --------- ++++++
-ronchehee ?u?ai ?h?odwig? bnd?t?rereit r?h? oaeoksiml heu?rn
---------- +++++ +++++++++ ++++++++++++ ++++ --------- ++++++
-mon??lic? zuzu? ninoabind ?ehnhoch?eu? bonn m??eksiii zeug?n
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-?on??lic? zuzu? einoabend zehnho?h?eu? bonn m??rrgiii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-?on??lic? zuzu? einoabind zehnho?h?eu? bonn m??ekkiii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-mon??lic? zuzu? eino?bind zehnhoch?eu? bonn ???ekkiii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-mon??lic? ?uzu? einoobind zehnhoch?eu? b?nn u??ekkiii zeu?in
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-don??li?? z?zug rinoubend zehnhoc??e?? bonn i??rrgiui zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-don??li?? zuz?g rinoubend zehnhoc??eu? bonn i??rrgi?i zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-?on??lic? zuz?g rinoubend zehnho?h?eu? bonn i??rrgi?i zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-?on??lic? zuzug rino?bend zehnho?h?eu? bonn ???rrgiii zeugin
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-?on??lic? ?uzug rinoobend zehnho?h?eu? b?nn u??rrgiii zeu?in
-+++++++++ +++++ --------- ++++++++++++ ++++ --------- ++++++
-rwfchlesg ?ezai e?ng?ben? ?agnh?ririan b?nn ?aerrgemb z?n??e
---------- +++++ +++++++++ ++++++++++++ ++++ --------- ++++++
-lonshiis? ?ez?i einoo?ond be?nhotigea? e??n un?ergi?? ?eu?rn
---------- +++++ --------- ++++++++++++ ++++ +++++++++ ++++++
+...
 ```
 We may conclude that some of the words are possibly ``monatlich`` (monthly), ``zuzug`` (immigration / moving *to* a place), ``kinoabend`` (cinema night), which didn't even appear in our dictionary, ``zehnhochneun`` (10^9), ``bonn`` (a city in germany) and ``zeugin`` (witness (female)).
+
+# So how does it work?
+There are two big parts to this program: Generating all possible configurations with dictionary queries for each of them, and, more appealing from a theoretical CS standpoint, answering these queries as fast as possible.
+
+
+## Query generation
+The query generation process itself is fairly simple. We enumerate all possible partitions of `{1,2,...,n}` (where `n` is the number of partial solutions) into two sets with ``std::next_permutation``. For each of these partitions we check whether this is legal, e.g. if we have a letter rule of type *M* and the corresponding word in our current configuration would have even length, we can discard this configuration immediately.
+
+If we have a valid configuration, we generate all word queries. For any letter rule, if the associated word is known, we take the letter according to the rule, and otherwise use `?` as a placeholder.
+
+## Query validation
+The more interesting part is answering a query. We have to be somewhat smart about how we organize the words in memory, so we can answer each query as quickly as possible. The data structure I settled on is a rooted tree *T* in which each edge is labelled with a letter. Adding a word is simple: We just create the path in `T` (if it doesn't yet exist) and mark the vertex the word ends on by following the appropriate edges as an endpoint.
+
+### Single word queries
+Validating a single word query is fairly simple: Just walk along the edges of the tree following the letters of the query. If we encounter a `?`, we consider each child of the current vertex. This smells like exponential run time in the number of `?` in the query, but *normal* dictionaries are fairly sparse once you create some distance from the root, so unless there are barely any known letters in a query, there won't be too many paths that we have to follow until the end. On the other hand, if the query consists of an abundance of `?`, we are somewhat likely to quickly find a path which terminates in an endpoint vertex. This may be yet another case of a theoretically difficult problem for which all instances appearing in practice are *simple* to solve. 
+
+Once a path finishes in a vertex that has been marked as an endpoint, we can safely terminate. If no such vertex exists, we know that no word fulfilling the given query exists in our tree.
+
+### Multiword queries
+
+Multiword queries are a bit more difficult to handle. Obviously we need to allow jumps back to root from any endpoint vertex. However, this alone is very inefficient: Each suffix of the given query might be checked many times if we branch many times due to `?`and then jump back to the root after matching the same amount of letters. Therefore, we must also remember for each suffix whether we tried to match it already and record its result.
+
+### Anagram queries
+
+Finally, let us talk about anagram queries. Finding anagrams is usually done by sorting the letters of the word in alphabetical order, words that were anagrams share the same *sorted* word. However, since we do not know which letter the `?` should correspond to, we would have to generate each possible assignment of letters to `?`and work with these. This can be done in a simpler way: Instead of just following the path of the current letter, we could also consume a `?` (if there is one left) and turn it into any other letter. Unfortunately, the dictionary tree is less sparse because it contains only the sorted words, so the running time in practice for anagram finding should scale worse.
+
+You might consider multiword dictionaries for anagrams. This is sadly not possible because the [exact cover](https://en.wikipedia.org/wiki/Exact_cover) problem (which is NP-hard) reduces to this, and solving it for *each* query would simply take way too much time.
