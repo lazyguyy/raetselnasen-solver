@@ -18,29 +18,29 @@ dictionary {
 }
 word {
     dictionary = simpledict;
-	letters = [F1P13;F3P18;B1P17;F1P25;B1P7;F3P1;F3P21;MP11;B3P20;]
+    letters = [F1P13;F3P18;B1P17;F1P25;B1P7;F3P1;F3P21;MP11;B3P20;]
 }
 word {
     dictionary = simpledict;
-	letters = [B1P15;F2P10;B4P27;F2P12;B2P6;]
+    letters = [B1P15;F2P10;B4P27;F2P12;B2P6;]
 }
 word {
     dictionary = simpledict;
-	letters = [B1P5;B2P26;F3P22;B3P19;F2P14;B4P24;B2P3;B1P23;F2P16;]
+    letters = [B1P5;B2P26;F3P22;B3P19;F2P14;B4P24;B2P3;B1P23;F2P16;]
 }
 word {
     dictionary = multidict;
-	letters = [B4P8;F6P21;B1P9;B1P27;F3P23;B3P16;B6P13;F7P11;B1P25;F2P17;B3P10;B1P20;]
+    letters = [B4P8;F6P21;B1P9;B1P27;F3P23;B3P16;B6P13;F7P11;B1P25;F2P17;B3P10;B1P20;]
 }
 word {
     dictionary = simpledict;
-	letters = [B1P1;F2P15;B5P24;B2P22;]
+    letters = [B1P1;F2P15;B5P24;B2P22;]
 }
 word {
     dictionary = simpledict;
-	letters = [B3P14;F9P25;F9P20;B2P2;B1P3;F1P4;F2P19;B3P12;B4P9;]
+    letters = [B3P14;F9P25;F9P20;B2P2;B1P3;F1P4;F2P19;B3P12;B4P9;]
 }
 word {
     dictionary = simpledict;
-	letters = [F4P24;B3P26;MP19;B4P15;B2P8;B1P18;]
+    letters = [F4P24;B3P26;MP19;B4P15;B2P8;B1P18;]
 }
