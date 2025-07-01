@@ -52,6 +52,7 @@ std::vector<WordList> collapse_multi_words(std::vector<MultiWord> &multiwords);
 size_t get_word_value(const std::string &word);
 size_t n_choose_k(size_t n, size_t k);
 std::vector<std::string> split_string(std::string &, char splitAt);
+std::string find_base_path(const std::string &file_name);
 
 template <typename value_t, typename value_s = value_t>
 void print_container(const std::vector<value_t> &vec, std::function<value_s(const value_t &)> transform = [](value_t &inp) -> value_s{return inp;}) {

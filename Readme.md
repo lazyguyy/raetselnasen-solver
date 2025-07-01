@@ -14,7 +14,7 @@ This is where this handy program comes in: It iterates through all possible arra
 
 # Running this Program
 This program is written in ``C++`` and should be compatible with ``cmake 3.28.1`` or greater and any compiler providing ``C++ 11`` features (locally I've been compiling it with ``g++ 13.1.0``). It takes the following command line options:
- * ``-f <puzzle_config>``: This is the most important argument and points to the configuration file the program should be using (more on the config file format in the next chapter). Please note that all paths specified in the config file are relative to the program's working directory, not the config file itself.
+ * ``-f <puzzle_config>``: This is the most important argument and points to the configuration file the program should be using (more on the config file format in the next chapter). Please note that all paths specified in the config file are relative to the config file itself.
  * ``-t <dictionary_name>``: Instead of solving the supplied puzzle, enters a test mode for the specified dictionary.
  * ``-q``: Instead of solving the supplied puzzle, enters a query test mode for the puzzle.
 
@@ -35,7 +35,7 @@ Special characters are `=`, `;`, brackets `[]` and parentheses `{}`. A semicolon
    * ``min_matches (int)``: How many words of the final solution should match at minimum for a configuration to not be discarded
    * ``show_matches {true | false}``: Indicates whether the program should show the matching words for each successful query (this can grow very fast very quickly)
    * ``show_config {true | false}``: Whether to show the positions of the unknown words in the sorted word list for each successful query configuration
-   * ``words_file (string)``: The path of the file containing the partial solutions (separated by new lines) (relative to the working directory of the program itself, not this file!). The program will ignore lines that start with a `#`, and (in the case of uncertainty) multiple partial solutions for the same slot can be separated by `,` (Think of the riddle: The better of the two sci-fi franchises with possible solutions `startrek` and `starwars`). The program will generate all possible combinations of partial solutions and solve for each individually.
+   * ``words_file (string)``: The path of the file containing the partial solutions (separated by new lines) (relative to this file). The program will ignore lines that start with a `#`, and (in the case of uncertainty) multiple partial solutions for the same slot can be separated by `,` (Think of the riddle: The better of the two sci-fi franchises with possible solutions `startrek` and `starwars`). The program will generate all possible combinations of partial solutions and solve for each individually.
  * ``dictionary`` defines a dictionary that can be used by the words of the final solution and contains the following options:
    * ``filename (str)``: The path of the file containing all dictionary words (separated by new lines)
    * ``name (str)``: How we can refer to this dictionary in ``word`` definitions
@@ -199,7 +199,7 @@ Obviously we cannot say with certainty what the solution should be, but dependin
 
 Here we also see the structure of a query: Depending on the placement of the known words in the current configuration, we simply construct each word from the actual solution to the best of our abilities, filling unknown letters in with a '?'.
 
-Adding the filter ``filters=[{satisfy=false;regex=^f.*;}]`` to our second word discards that group of matches completely, and we arrive at
+Adding the filter ``filters=[{satisfy=false;regex=^f.*;}]`` to our second word discards that group of matches entirely, and we arrive at
 ```
 ...
 1 orderings matching at least 3 words were found!
@@ -331,19 +331,19 @@ The query generation process itself is fairly simple. We enumerate all possible 
 If we have a valid configuration, we generate all word queries. For any letter rule, if the associated word is known, we take the letter according to the rule, and otherwise use `?` as a placeholder.
 
 ## Query validation
-The more interesting part is answering a query. We have to be somewhat smart about how we organize the words in memory, so we can answer each query as quickly as possible. The data structure I settled on is a rooted tree *T* in which each edge is labelled with a letter. Adding a word is simple: We just create the path in `T` (if it doesn't yet exist) and mark the vertex the word ends on by following the appropriate edges as an endpoint.
+The more interesting part is answering a query. We have to be somewhat smart about how we organize the words in memory, so we can answer each query as quickly as possible. The data structure I settled on is a rooted tree *T* in which each edge is labelled with a letter. Adding a word is easy: We just create the path in `T` (if it doesn't already exist) and mark the vertex the word ends on by following the appropriate edges as an endpoint.
 
 ### Single word queries
-Validating a single word query is fairly simple: Just walk along the edges of the tree following the letters of the query. If we encounter a `?`, we consider each child of the current vertex. This smells like exponential run time in the number of `?` in the query, but *normal* dictionaries are fairly sparse once you create some distance from the root, so unless there are barely any known letters in a query, there won't be too many paths that we have to follow until the end. On the other hand, if the query consists of an abundance of `?`, we are somewhat likely to quickly find a path which terminates in an endpoint vertex. This may be yet another case of a theoretically difficult problem for which all instances appearing in practice are *simple* to solve. 
+Validating a single word query is fairly simple: Just walk along the edges of the tree following the letters of the query. If we encounter a `?`, we branch on each child of the current vertex as any letter could be the correct one. While this smells like exponential run time in the number of `?` in the query, *normal* dictionaries are fairly sparse once you create some distance from the root. Consequently, unless there are barely any known letters in a query, there won't be too many paths that we have to follow. On the other hand, if the query consists of an abundance of `?`, we are somewhat likely to quickly find a path which terminates in an endpoint vertex. Still, queries like `?????????qqqqq` might take a long time to rule out.
 
-Once a path finishes in a vertex that has been marked as an endpoint, we can safely terminate. If no such vertex exists, we know that no word fulfilling the given query exists in our tree.
+Once a path end on an endpoint, we can safely terminate. If no such vertex exists, we know that no word fulfilling the given query exists in our tree.
 
 ### Multiword queries
 
-Multiword queries are a bit more difficult to handle. Obviously we need to allow jumps back to root from any endpoint vertex. However, this alone is very inefficient: Each suffix of the given query might be checked many times if we branch many times due to `?`and then jump back to the root after matching the same amount of letters. Therefore, we must also remember for each suffix whether we tried to match it already and record its result.
+Multiword queries are a bit more difficult to handle. Obviously we need to allow jumps back to root from any endpoint vertex. However, we should also remember for each suffix whether we tried to match it already and record its result, as we might jump back to the root at the same index multiple times.
 
 ### Anagram queries
 
-Finally, let us talk about anagram queries. Finding anagrams is usually done by sorting the letters of the word in alphabetical order, words that were anagrams share the same *sorted* word. However, since we do not know which letter the `?` should correspond to, we would have to generate each possible assignment of letters to `?`and work with these. This can be done in a simpler way: Instead of just following the path of the current letter, we could also consume a `?` (if there is one left) and turn it into any other letter. Unfortunately, the dictionary tree is less sparse because it contains only the sorted words, so the running time in practice for anagram finding should scale worse.
+Finally, let us talk about anagram queries. Finding anagrams is usually done by sorting the letters of the word in alphabetical order, because words that are anagrams of each other share the same *sorted* word. However, we do not know which letter the `?` should correspond to. Generating each possible assignment of letters to `?` and testing each individually sounds nightmarish (both to program, but also in its running time). Luckily, this can be done in a simpler way: Instead of just following the path of the current letter, we could also consume a `?` (if there is one left) and turn it into any other letter. Unfortunately, the dictionary tree is less sparse because it contains only the sorted words, so the running time in practice for anagram finding should scale worse.
 
 You might consider multiword dictionaries for anagrams. This is sadly not possible because the [exact cover](https://en.wikipedia.org/wiki/Exact_cover) problem (which is NP-hard) reduces to this, and solving it for *each* query would simply take way too much time.

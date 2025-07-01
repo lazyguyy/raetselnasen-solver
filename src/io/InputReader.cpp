@@ -7,7 +7,15 @@
 #include <sstream>
 #include <regex>
 
+void warn_if_file_empty(const std::string &filename) {
+    std::ifstream f(filename);
+    if (!f.good()) {
+        std::cerr << "It appears that no file " << filename << " relative to your working directory exists." << std::endl;
+    }
+}
+
 std::vector<MultiWord> InputReader::read_solutions_list(const std::string &filename) {
+    warn_if_file_empty(filename);
     std::vector<MultiWord> words;
     std::ifstream input_file(filename);
     std::string line;
@@ -249,6 +257,7 @@ general_settings InputReader::parse_settings(std::ifstream &input_stream) {
 }
 
 Puzzle InputReader::read_puzzle(const std::string &puzzle_config_file) {
+    auto base_path = find_base_path(puzzle_config_file);
     std::ifstream input_stream(puzzle_config_file);
     std::vector<word_settings> unconstructed_words;
     std::vector<Word> words;
@@ -271,15 +280,17 @@ Puzzle InputReader::read_puzzle(const std::string &puzzle_config_file) {
                 filters.push_back({f.satisfy, ff});
             }
             std::shared_ptr<Dictionary> dict;
+            std::string dict_file = base_path + parsed.filename;
+            warn_if_file_empty(dict_file);
             switch (parsed.type) {
                 case AnagramDictionaryType:
-                    dict = std::make_shared<AnagramDictionary>(AnagramDictionary(parsed.print_words).construct(parsed.filename, filters));
+                    dict = std::make_shared<AnagramDictionary>(AnagramDictionary(parsed.print_words).construct(dict_file, filters));
                     break;
                 case SingleWordDictionaryType:
-                    dict = std::make_shared<TreeDictionary>(TreeDictionary(parsed.print_words).construct(parsed.filename, filters));
+                    dict = std::make_shared<TreeDictionary>(TreeDictionary(parsed.print_words).construct(dict_file, filters));
                     break;
                 case MultiWordDictionaryType:
-                    dict = std::make_shared<MultiWordTreeDictionary>(MultiWordTreeDictionary(parsed.print_words).construct(parsed.filename, filters));
+                    dict = std::make_shared<MultiWordTreeDictionary>(MultiWordTreeDictionary(parsed.print_words).construct(dict_file, filters));
                     break;
             }
             dicts[parsed.name] = dict;
@@ -299,5 +310,5 @@ Puzzle InputReader::read_puzzle(const std::string &puzzle_config_file) {
     for (auto &word_settings : unconstructed_words) {
         words.push_back(construct_word(word_settings, dicts));
     }
-    return {words, read_solutions_list(settings.words_file), dicts, settings.min_matches, settings.total_words, settings.detail_level, settings.show_matches, settings.show_configuration};
+    return {words, read_solutions_list(base_path + settings.words_file), dicts, settings.min_matches, settings.total_words, settings.detail_level, settings.show_matches, settings.show_configuration};
 }

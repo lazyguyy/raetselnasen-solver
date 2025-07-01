@@ -3,16 +3,16 @@ general {
     total_words = 27;
     show_matches = false;
     show_config = true;
-    words_file = puzzle24/words.txt;
+    words_file = words.txt;
 }
 dictionary {
     name = simpledict;
-    filename = puzzle24/dictionary.txt;
+    filename = dictionary.txt;
     type = single_word;
 }
 dictionary {
     name = multidict;
-    filename = puzzle24/dictionary.txt;
+    filename = dictionary.txt;
     type = multi_word;
     filters = [{satisfy=true;regex=.....*;}];
 }

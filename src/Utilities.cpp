@@ -88,5 +88,10 @@ std::vector<std::string> split_string(std::string &string, char splitAt) {
     return std::move(segments);
 }
 
+std::string find_base_path(const std::string &file_name) {
+    auto last_slash = file_name.find_last_of('/');
+    return file_name.substr(0, last_slash + 1);
+}
+
 
 

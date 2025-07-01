@@ -2,21 +2,21 @@ general {
     min_matches = 3;
     total_words = 7;
     show_matches = true;
-    words_file = simple_test/words.txt;
+    words_file = words.txt;
 }
 dictionary {
     name = simpledict;
-    filename = simple_test/dictionary.txt;
+    filename = dictionary.txt;
     type = single_word;
 }
 dictionary {
     name = anagramdict;
-    filename = simple_test/dictionary.txt;
+    filename = dictionary.txt;
     type = anagram;
 }
 dictionary {
     name = multidict;
-    filename = simple_test/dictionary.txt;
+    filename = dictionary.txt;
     type = multi_word;
     filters = [{satisfy=true;regex=.....*;}];
 }
