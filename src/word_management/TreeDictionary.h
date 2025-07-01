@@ -11,19 +11,18 @@
 
 
 struct Node {
-    std::unordered_map<char, Node> children;
+    std::unordered_map<char, std::shared_ptr<Node>> children;
     bool is_endpoint;
     size_t depth;
+
+    explicit Node(size_t depth): depth(depth), is_endpoint(false) {}
 };
 
 class TreeDictionary : public Dictionary {
 public:
     Node root;
 
-    explicit TreeDictionary(bool printWords) : Dictionary(printWords) {
-        root.depth = 0;
-        root.is_endpoint = false;
-    };
+    explicit TreeDictionary(bool printWords) : Dictionary(printWords), root(0) {}
     ~TreeDictionary() override = default;
 
     bool add_word(const std::string &word) override;

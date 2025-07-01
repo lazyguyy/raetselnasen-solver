@@ -38,7 +38,7 @@ bool AnagramDictionary::has_word(Node &current, const std::string &query, size_t
             return current.is_endpoint;
         }
         for (auto &pair : current.children) {
-            if (has_word(pair.second, query, index, blanks - 1)) {
+            if (has_word(*pair.second, query, index, blanks - 1)) {
                 return true;
             }
         }
@@ -47,14 +47,14 @@ bool AnagramDictionary::has_word(Node &current, const std::string &query, size_t
     auto letter = std::tolower(query[index], std::locale());
     bool contained = false;
     if (current.children.count(letter) > 0) {
-        contained |= has_word(current.children[letter], query, index + 1, blanks);
+        contained |= has_word(*current.children[letter], query, index + 1, blanks);
     }
     if (!contained && blanks > 0) {
         for (auto &pair: current.children) {
             if (pair.first == letter) {
                 continue;
             }
-            contained |= has_word(pair.second, query, index, blanks - 1);
+            contained |= has_word(*pair.second, query, index, blanks - 1);
         }
     }
     return contained;
@@ -82,19 +82,19 @@ void AnagramDictionary::get_words(Node &current, const std::string &query, size_
                 found_anagrams.insert(current_path);
         }
         for (auto &pair : current.children) {
-            get_words(pair.second, query, index, current_path + pair.first, blanks - 1, found_anagrams);
+            get_words(*pair.second, query, index, current_path + pair.first, blanks - 1, found_anagrams);
         }
     }
     auto letter = std::tolower(query[index], std::locale());
     if (current.children.count(letter) > 0) {
-        get_words(current.children[letter], query, index + 1, current_path + letter, blanks, found_anagrams);
+        get_words(*current.children[letter], query, index + 1, current_path + letter, blanks, found_anagrams);
     }
     if (blanks > 0) {
         for (auto &pair: current.children) {
             if (pair.first == letter) {
                 continue;
             }
-            get_words(pair.second, query, index, current_path + pair.first, blanks - 1, found_anagrams);
+            get_words(*pair.second, query, index, current_path + pair.first, blanks - 1, found_anagrams);
         }
     }
 }

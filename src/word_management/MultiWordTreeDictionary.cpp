@@ -24,11 +24,11 @@ bool MultiWordTreeDictionary::has_word(Node &current_node, const std::string &qu
     auto letter = std::tolower(query[index], std::locale());
     if (letter == '?') {
         for (auto &child_pair: current_node.children) {
-            if (has_word(child_pair.second, query, index + 1, contained_suffixes))
+            if (has_word(*child_pair.second, query, index + 1, contained_suffixes))
                 return true;
         }
     } else if (current_node.children.count(letter) > 0){
-        return has_word(current_node.children[letter], query, index + 1, contained_suffixes);
+        return has_word(*current_node.children[letter], query, index + 1, contained_suffixes);
     }
     return false;
 }
@@ -62,10 +62,10 @@ bool MultiWordTreeDictionary::get_words(Node &current_node, const std::string &q
     bool has_word = false;
     if (letter == '?') {
         for (auto &child_pair: current_node.children) {
-            has_word |= get_words(child_pair.second, query, index + 1, current_path + child_pair.first, matches_by_suffix, suffix_contained);
+            has_word |= get_words(*child_pair.second, query, index + 1, current_path + child_pair.first, matches_by_suffix, suffix_contained);
         }
     } else if (current_node.children.count(letter) > 0){
-        has_word |= get_words(current_node.children[letter], query, index + 1, current_path + letter, matches_by_suffix, suffix_contained);
+        has_word |= get_words(*current_node.children[letter], query, index + 1, current_path + letter, matches_by_suffix, suffix_contained);
     }
     return has_word;
 }

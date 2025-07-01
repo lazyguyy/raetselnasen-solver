@@ -33,11 +33,9 @@ bool TreeDictionary::add_word(Node &node, const std::string &word, size_t index)
     char letter = std::tolower(word[index], std::locale());
 
     if (node.children.count(letter) == 0){
-        auto new_node = Node();
-        new_node.depth = node.depth + 1;
-        node.children[letter] = new_node;
+        node.children[letter] = std::make_shared<Node>(node.depth + 1);
     }
-    return add_word(node.children[letter], word, index + 1);
+    return add_word(*node.children[letter], word, index + 1);
 }
 
 bool TreeDictionary::has_word(const WordQuery &query) {
@@ -51,11 +49,11 @@ bool TreeDictionary::has_word(Node &current_node, const std::string &query, size
     auto letter = std::tolower(query[index], std::locale());
     if (letter == '?') {
         for (auto &child_pair: current_node.children) {
-            if (has_word(child_pair.second, query, index + 1))
+            if (has_word(*child_pair.second, query, index + 1))
                 return true;
         }
     } else if (current_node.children.count(letter) > 0){
-        return has_word(current_node.children[letter], query, index + 1);
+        return has_word(*current_node.children[letter], query, index + 1);
     }
     return false;
 }
@@ -77,10 +75,10 @@ void TreeDictionary::get_words(Node &current_node, const std::string &query, std
     auto letter = std::tolower(query[index], std::locale());
     if (letter == '?') {
         for (auto &child_pair: current_node.children) {
-            get_words(child_pair.second, query, current_path + child_pair.first, matches);
+            get_words(*child_pair.second, query, current_path + child_pair.first, matches);
         }
     } else if (current_node.children.count(letter) > 0){
-        get_words(current_node.children[letter], query, current_path + letter, matches);
+        get_words(*current_node.children[letter], query, current_path + letter, matches);
     }
 }
 
