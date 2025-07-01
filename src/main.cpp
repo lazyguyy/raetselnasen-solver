@@ -118,18 +118,17 @@ int main(int argc, char **argv) {
     std::cout << "There are (" << puzzle.total_words << " choose " << puzzle.input_words.size() << ") * " << manager.collapsed_multi_words.size() << " = " << manager.total_possibilities  << " possible configurations." << std::endl;
     std::vector<QueryStruct> successful_queries;
     std::vector<std::vector<bool>> non_blanks;
-    size_t check_interval = manager.total_possibilities / 100 / manager.collapsed_multi_words.size() + 1;
+    size_t last_percentage = 0;
     while (!manager.finished) {
-        auto percentage = manager.past_orderings * 100 * manager.collapsed_multi_words.size() / manager.total_possibilities;
-        if (manager.past_orderings % check_interval == 0) {
-            std::cout << (percentage % 10 == 0 ? '|' : '.') << std::flush;
+        auto percentage = (manager.past_orderings + 1) * 100 * manager.collapsed_multi_words.size() / manager.total_possibilities;
+        while (last_percentage <= percentage) {
+            std::cout << (last_percentage % 10 ? '#' : '|');
+            last_percentage++;
         }
         if (manager.complies(puzzle)) {
             auto all_queries = manager.generate_queries(puzzle);
             for (auto &query_struct : all_queries) {
-//                print_container<WordQuery, std::string>(query_struct.query, [](const WordQuery &query) -> std::string {return query.query_string;});
                 auto &query = query_struct.query;
-//                std::cout << manager.past_orderings << "(" << percentage << "%): ";
                 if (check_query(query, puzzle.min_matches)) {
                     successful_queries.push_back(query_struct);
                     non_blanks.push_back(manager.non_blanks);
