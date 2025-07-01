@@ -92,7 +92,7 @@ word {
 }
 ```
 
-Since random dictionary files generated from the internet are often not very clean, it is very important to preprocess them as otherwise the number of matches (especially in ``multi_word``-type dictionaries) can increase dramatically. As a simple clean-up, we remove all words from the ``multi_word`` dictionary of length less than four. 
+Because random dictionary files taken from the internet are often not very clean, it is very important to preprocess them as otherwise the number of matches (especially in ``multi_word``-type dictionaries) can increase dramatically. As a simple clean-up, we remove all words from the ``multi_word`` dictionary of length less than four. 
 
 Depending on how many of the seven partial solutions we provide in ``words.txt``, the outputs may look drastically different.
 
