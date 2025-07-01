@@ -6,7 +6,6 @@
 #include <unordered_set>
 #include <vector>
 #include <iostream>
-#include <bits/shared_ptr.h>
 #include <functional>
 #include <regex>
 
